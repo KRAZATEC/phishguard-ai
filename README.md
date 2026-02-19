@@ -10,17 +10,17 @@
 
 ```mermaid
 graph TD
-    User[👤 User] -->|HTTPS| Frontend[💻 Frontend (React + Nginx)]
-    Frontend -->|REST API| Backend[🧠 Backend (FastAPI)]
+    User["👤 User"] -->|HTTPS| Frontend["💻 Frontend (React + Nginx)"]
+    Frontend -->|REST API| Backend["🧠 Backend (FastAPI)"]
     
     subgraph "Backend Services"
-        Backend -->|Auth| Auth[🔐 JWT Authentication]
-        Backend -->|Store| DB[(🍃 MongoDB Atlas)]
-        Backend -->|Predict| ML[🤖 ML Models]
-        Backend -->|Check| HIBP[🔍 HaveIBeenPwned API]
+        Backend -->|Auth| Auth["🔐 JWT Authentication"]
+        Backend -->|Store| DB[("🍃 MongoDB Atlas")]
+        Backend -->|Predict| ML["🤖 ML Models"]
+        Backend -->|Check| HIBP["🔍 HaveIBeenPwned API"]
     end
     
-    ML -->|Load| PKL[📦 Pickle Models (URL/Email)]
+    ML -->|Load| PKL["📦 Pickle Models (URL/Email)"]
 ```
 
 ---
