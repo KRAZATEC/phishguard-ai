@@ -1,208 +1,153 @@
 # PhishGuard AI 🛡️
 
-**AI-Powered Phishing Detection Platform** — Full-stack SaaS application for detecting phishing URLs and emails using Machine Learning.
+**AI-Powered Phishing Detection Platform** — A full-stack security application using Machine Learning to detect phishing URLs and malicious emails in real-time.
 
-![Tech Stack](https://img.shields.io/badge/FastAPI-0.110-green) ![React](https://img.shields.io/badge/React-18-blue) ![scikit--learn](https://img.shields.io/badge/scikit--learn-1.4-orange) ![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-brightgreen)
+![Tech Stack](https://img.shields.io/badge/FastAPI-0.110-green) ![React](https://img.shields.io/badge/React-18-blue) ![Docker](https://img.shields.io/badge/Docker-20.10-blue) ![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-brightgreen) ![scikit--learn](https://img.shields.io/badge/scikit--learn-1.4-orange)
+
+---
+
+## 🏗️ System Architecture
+
+```mermaid
+graph TD
+    User[👤 User] -->|HTTPS| Frontend[💻 Frontend (React + Nginx)]
+    Frontend -->|REST API| Backend[🧠 Backend (FastAPI)]
+    
+    subgraph "Backend Services"
+        Backend -->|Auth| Auth[🔐 JWT Authentication]
+        Backend -->|Store| DB[(🍃 MongoDB Atlas)]
+        Backend -->|Predict| ML[🤖 ML Models]
+        Backend -->|Check| HIBP[🔍 HaveIBeenPwned API]
+    end
+    
+    ML -->|Load| PKL[📦 Pickle Models (URL/Email)]
+```
 
 ---
 
 ## 🚀 Features
 
-- **URL Phishing Detection** — Random Forest classifier with 18+ URL features
-- **Email Phishing Detection** — TF-IDF + Random Forest NLP model
-- **Explainable AI** — Human-readable reasons for every detection
-- **Confidence Scores** — `predict_proba` based scoring (0-100%)
-- **Risk Levels** — Low / Medium / High classification
-- **JWT Authentication** — Secure login/register with bcrypt hashing
-- **Dashboard** — Charts, stats, scan history
-- **Dark Mode UI** — Glassmorphism + gradient SaaS design
+### 🔍 Phishing Detection
+- **URL Scanning**: Analyzes URLs using a Random Forest classifier (18+ features extracted).
+- **Email Analysis**: Uses NLP (TF-IDF) to detect malicious patterns in email subject and body.
+- **Explainable AI**: Provides human-readable reasons for every "Phishing" or "Safe" verdict.
+
+### 🛡️ Security & Privacy
+- **Data Breach Scanner**: Integrates with *Have I Been Pwned* to check if your email has been compromised.
+- **Community Reporting**: Users can report suspicious URLs to help improve the system.
+- **Secure Auth**: JWT-based session management with Bcrypt password hashing.
+
+### 📊 Dashboard
+- **Interactive Charts**: Visual breakdown of scan history and threats detected.
+- **Scan History**: Detailed log of all user activity.
+- **Dark Mode**: Sleek, modern glassmorphism UI.
 
 ---
 
-## 📁 Project Structure
+## 🛠️ Tech Stack
 
-```
-phishguard-ai/
-├── backend/
-│   ├── main.py              # FastAPI app + all routes
-│   ├── auth.py              # JWT + bcrypt authentication
-│   ├── database.py          # MongoDB Motor connection
-│   ├── models.py            # Pydantic schemas
-│   ├── ml/
-│   │   ├── url_model.py     # URL feature extraction + prediction
-│   │   ├── email_model.py   # Email TF-IDF + prediction
-│   │   ├── train_url.py     # URL model training
-│   │   └── train_email.py   # Email model training
-│   ├── models_pkl/          # Saved .pkl model files (auto-generated)
-│   ├── requirements.txt
-│   └── .env.example
-│
-├── frontend/
-│   ├── src/
-│   │   ├── pages/           # Landing, Login, Register, Dashboard, UrlDetect, EmailDetect
-│   │   ├── components/      # Sidebar
-│   │   ├── context/         # AuthContext (JWT + localStorage)
-│   │   └── services/        # api.js (Axios)
-│   ├── tailwind.config.js
-│   ├── vite.config.js
-│   └── .env.example
-│
-└── README.md
-```
+| Component | Technology | Description |
+|-----------|------------|-------------|
+| **Frontend** | React + Vite | Fast, modern UI with TailwindCSS for styling. |
+| **Backend** | FastAPI | High-performance Python API framework. |
+| **Database** | MongoDB Motor | Async database driver for MongoDB Atlas. |
+| **ML Engine** | Scikit-Learn | Random Forest & TF-IDF models for classification. |
+| **DevOps** | Docker | Containerized deployment for consistency. |
+| **Hosting** | Railway | PaaS provider for hosting Docker containers. |
 
 ---
 
-## ⚙️ Local Setup
+## ⚙️ Installation (Local)
 
-### Prerequisites
-- Python 3.10+
-- Node.js 18+
-- MongoDB Atlas account (or local MongoDB)
+### Option A: Docker (Recommended) 🐳
+The easiest way to run PhishGuard AI is using Docker Compose.
+
+1.  **Clone the repository**
+    ```bash
+    git clone https://github.com/YOUR_USERNAME/phishguard-ai.git
+    cd phishguard-ai
+    ```
+
+2.  **Configure Environment**
+    Create a `.env` file in `backend/`:
+    ```ini
+    MONGODB_URL=your_mongodb_connection_string
+    SECRET_KEY=your_secret_key
+    ALLOWED_ORIGINS=*
+    ```
+
+3.  **Run with Docker Compose**
+    ```bash
+    docker-compose up --build
+    ```
+
+4.  **Access the App**
+    - Frontend: `http://localhost:3000`
+    - Backend: `http://localhost:8000`
 
 ---
 
-### Backend Setup
+### Option B: Manual Setup
 
+#### 1. Backend Setup
 ```bash
 cd backend
-
-# Create virtual environment
 python -m venv venv
-venv\Scripts\activate          # Windows
-# source venv/bin/activate     # Mac/Linux
-
-# Install dependencies
+# Activate venv (Windows: venv\Scripts\activate, Mac/Linux: source venv/bin/activate)
 pip install -r requirements.txt
-
-# Configure environment
-copy .env.example .env
-# Edit .env with your MongoDB URL and secret key
-
-# Train ML models (generates models_pkl/*.pkl files)
-python ml/train_url.py
+python ml/train_url.py    # Train models
 python ml/train_email.py
-
-# Start the server
-uvicorn main:app --reload --port 8000
+uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-Backend runs at: `http://localhost:8000`
-API docs at: `http://localhost:8000/docs`
-
----
-
-### Frontend Setup
-
+#### 2. Frontend Setup
 ```bash
 cd frontend
-
-# Install dependencies
 npm install
-
-# Configure environment
-copy .env.example .env
-# Edit VITE_API_URL=http://localhost:8000
-
-# Start dev server
 npm run dev
 ```
 
-Frontend runs at: `http://localhost:5173`
-
 ---
 
-## 🌐 Deployment
+## 🌐 Deployment (Railway)
 
-### Frontend → Vercel
+This project is configured for seamless deployment on **Railway** using Docker.
 
-1. Push `frontend/` to a GitHub repository
-2. Import the repo in [Vercel](https://vercel.com/)
-3. Set build settings:
-   - **Framework**: Vite
-   - **Root Directory**: `frontend`
-   - **Build Command**: `npm run build`
-   - **Output Directory**: `dist`
-4. Set environment variable:
-   - `VITE_API_URL` = `https://your-backend.onrender.com`
-5. Deploy!
-
----
-
-### Backend → Render
-
-1. Push `backend/` to a GitHub repository
-2. Create a new **Web Service** on [Render](https://render.com/)
-3. Set:
-   - **Root Directory**: `backend`
-   - **Build Command**: `pip install -r requirements.txt && python ml/train_url.py && python ml/train_email.py`
-   - **Start Command**: `uvicorn main:app --host 0.0.0.0 --port $PORT`
-4. Set environment variables:
-   - `MONGODB_URL` = your MongoDB Atlas connection string
-   - `SECRET_KEY` = a long random secret
-   - `ALLOWED_ORIGINS` = `https://your-app.vercel.app`
-5. Deploy!
-
----
-
-### Database → MongoDB Atlas
-
-1. Go to [MongoDB Atlas](https://cloud.mongodb.com/)
-2. Create a free cluster
-3. Create a database user
-4. Get the connection string:
-   `mongodb+srv://<user>:<password>@cluster0.mongodb.net/phishguard`
-5. Add to your `.env` file as `MONGODB_URL`
-6. Whitelist your IP (or use `0.0.0.0/0` for Render)
+1.  **Fork/Clone** this repo to your GitHub.
+2.  **Login to Railway** and create a new project from your GitHub repo.
+3.  **Deploy Backend**:
+    - Root Directory: `/backend`
+    - Variables: `MONGODB_URL`, `SECRET_KEY`, `ALLOWED_ORIGINS`
+4.  **Deploy Frontend**:
+    - Root Directory: `/frontend`
+    - Variables: `VITE_API_URL` (Set this to your Railway Backend URL, e.g., `https://web-production.up.railway.app`)
+    - *Note: The frontend Dockerfile builds the React app, so `VITE_API_URL` is needed at build time.*
 
 ---
 
 ## 🔌 API Reference
 
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| POST | `/register` | No | Create account |
-| POST | `/login` | No | Login + get JWT |
-| GET | `/me` | Yes | Current user info |
-| POST | `/predict-url` | Yes | Analyze a URL |
-| POST | `/predict-email` | Yes | Analyze email content |
-| GET | `/history` | Yes | Scan history |
-| GET | `/stats` | Yes | Dashboard statistics |
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/auth/register` | Register a new user |
+| `POST` | `/auth/login` | Login and get JWT token |
+| `POST` | `/predict-url` | Scan a URL for phishing |
+| `POST` | `/predict-email` | Scan email content |
+| `POST` | `/check-breach` | Check if email is in a breach |
+| `GET` | `/stats` | Get user dashboard statistics |
 
 ---
 
-## 🤖 ML Model Details
+## 📸 Screenshots
 
-### URL Detection (Random Forest)
-**Features extracted:**
-- URL length, dot count, hyphen count
-- HTTPS presence, IP address detection
-- Suspicious keyword count (30+ keywords)
-- Subdomain depth, TLD, path length
-- Special character count
+| Landing Page | Dashboard |
+|--------------|-----------|
+| ![Landing](https://placehold.co/600x400?text=Landing+Page+Screenshot) | ![Dashboard](https://placehold.co/600x400?text=Dashboard+Screenshot) |
 
-### Email Detection (TF-IDF + Random Forest)
-- Preprocesses email (strips HTML, normalizes URLs/emails/numbers)
-- TF-IDF vectorizer with 5,000 features, bigrams
-- Random Forest with 200 trees, balanced class weights
-- Top TF-IDF terms used for explainability
+| URL Detection | Email Scanner |
+|---------------|---------------|
+| ![URL Scan](https://placehold.co/600x400?text=URL+Detection+Screenshot) | ![Email Scan](https://placehold.co/600x400?text=Email+Scanner+Screenshot) |
 
 ---
 
-## 🔒 Security
-
-- Passwords hashed with **bcrypt**
-- JWT tokens with configurable expiry (default: 24h)
-- **CORS** restricted to specified origins in production
-- MongoDB connection via secure Atlas string
-- All sensitive config in environment variables
-
----
-
-## 📸 Pages
-
-- `/` — Landing page with hero + features
-- `/login` — Sign in
-- `/register` — Create account
-- `/dashboard` — Stats + charts + history
-- `/detect/url` — URL scanner
-- `/detect/email` — Email scanner
+Made with ❤️ by [Your Name]
