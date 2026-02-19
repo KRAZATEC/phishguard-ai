@@ -9,3 +9,5 @@ scikit-learn==1.4.0
 numpy==1.26.4
 pydantic[email]==2.6.1
 python-multipart==0.0.9
+certifi==2024.2.2
+dnspython==2.6.1
